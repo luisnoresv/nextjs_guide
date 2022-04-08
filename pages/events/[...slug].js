@@ -1,3 +1,4 @@
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import useSWR from 'swr';
@@ -6,7 +7,7 @@ import EventList from '../../components/events/event-list';
 import ResultsTitle from '../../components/events/results-title';
 import Button from '../../components/ui/button';
 import ErrorAlert from '../../components/ui/error-alert';
-import { getFilteredEvents } from '../../helpers/api-util';
+// import { getFilteredEvents } from '../../helpers/api-util';
 
 export default function FilteredEventsPage(props) {
 	const [loadedEvents, setLoadedEvents] = useState([]);
@@ -35,13 +36,36 @@ export default function FilteredEventsPage(props) {
 		}
 	}, [data]);
 
-	if (!loadedEvents) return <p className='center'>Loading...</p>;
+	let pageHeadData = (
+		<Head>
+			<title>Filtered Events</title>
+			<meta name='description' content='A list of filtered events.' />
+		</Head>
+	);
+
+	if (!loadedEvents)
+		return (
+			<>
+				{pageHeadData}
+				<p className='center'>Loading...</p>;
+			</>
+		);
 
 	const filteredYear = filterData[0];
 	const filterdMonth = filterData[1];
 
 	const numYear = +filteredYear;
 	const numMonth = +filterdMonth;
+
+	pageHeadData = (
+		<Head>
+			<title>Filtered Events</title>
+			<meta
+				name='description'
+				content={`All Events for ${numMonth}/${numYear}`}
+			/>
+		</Head>
+	);
 
 	if (
 		isNaN(numYear) ||
@@ -54,6 +78,7 @@ export default function FilteredEventsPage(props) {
 	) {
 		return (
 			<>
+				{pageHeadData}
 				<ErrorAlert>
 					<p>Invalid filter. Please adjust your values!</p>
 				</ErrorAlert>
@@ -89,6 +114,7 @@ export default function FilteredEventsPage(props) {
 
 	return (
 		<>
+			{pageHeadData}
 			<ResultsTitle date={date} />
 			<EventList items={filteredEvents} />
 		</>
